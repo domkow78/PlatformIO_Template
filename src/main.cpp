@@ -1,8 +1,22 @@
-int main()
+#include <Arduino.h>
+
+#include "project.h"
+#include "Logger.h"
+
+void setup()
 {
-    Board::init();
+    pinMode(PIN_LED, OUTPUT);
 
-    Application app;
+    Logger::begin(SERIAL_BAUDRATE);
 
-    app.run();
+    Logger::info("Application started");
+}
+
+void loop()
+{
+    digitalWrite(PIN_LED, HIGH);
+    delay(500);
+
+    digitalWrite(PIN_LED, LOW);
+    delay(500);
 }
