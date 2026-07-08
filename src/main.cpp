@@ -1,17 +1,17 @@
 #include <Arduino.h>
 
-#include "Application.h"
 #include "Board.h"
-
-Application app;
 
 void setup()
 {
     Board::init();
-    app.begin();
 }
 
 void loop()
 {
-    app.run();
+    digitalWrite(PIN_LED, HIGH);
+    delay(500);
+
+    digitalWrite(PIN_LED, LOW);
+    delay(500);
 }
