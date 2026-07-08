@@ -1,16 +1,8 @@
-#include <Arduino.h>
-
-void setup()
+int main()
 {
-    pinMode(LED_BUILTIN, OUTPUT);
-}
+    Board::init();
 
-void loop()
-{
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(500);
+    Application app;
 
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(500);
-
+    app.run();
 }
