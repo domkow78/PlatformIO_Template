@@ -1,283 +1,290 @@
 # PlatformIO Template -- Podsumowanie prac i plan rozwoju
 
-**Data:** 2026-07-08
+**Data aktualizacji:** 2026-07-09  
+**Status dokumentu:** aktywny (wersja robocza)
 
-## Cel
+## 1. Cel
 
-Celem jest stworzenie własnego szablonu projektu PlatformIO, który
-będzie wykorzystywany we wszystkich przyszłych projektach (Arduino,
-ESP32, Raspberry Pi Pico i inne).
+Celem jest stworzenie własnego, lekkiego szablonu projektu PlatformIO, który będzie wykorzystywany w kolejnych projektach embedded (Arduino, ESP32, RP2040/Pico i inne).
 
-Projekt ma stanowić bazę do budowy własnego frameworka embedded.
+Szablon ma być fundamentem pod rozwój własnego frameworka embedded: modularnego, testowalnego i możliwego do ponownego użycia.
 
-------------------------------------------------------------------------
+---
 
-# Co zostało wykonane
+## 2. Zakres
 
-## Środowisko
+Zakres szablonu obejmuje:
 
--   Zainstalowano Visual Studio Code.
--   Zainstalowano PlatformIO.
--   Dodano polecenie `pio` do zmiennej `PATH`.
--   Zweryfikowano działanie:
-    -   `pio --version`
-    -   `pio project init`
-    -   `pio run`
+- spójną strukturę repozytorium,
+- podstawową architekturę warstwową,
+- moduły bazowe (`Board`, `Application`, `Logger`),
+- konwencje konfiguracji i wersjonowania,
+- gotowość pod testy, automatyzację i release.
 
-------------------------------------------------------------------------
+Poza zakresem (na ten etap):
 
-## Git
+- zaawansowany RTOS,
+- pełna standaryzacja protokołów przemysłowych,
+- rozbudowane GUI/HMI.
 
--   Utworzono lokalne repozytorium.
--   Wypchnięto projekt do zdalnego repozytorium.
--   Zweryfikowano poprawne działanie `git push`.
+---
 
-------------------------------------------------------------------------
+## 3. Co zostało wykonane
 
-## Struktura projektu
+### 3.1 Środowisko
 
-Obecna struktura:
+- Zainstalowano Visual Studio Code.
+- Zainstalowano PlatformIO.
+- Dodano `pio` do `PATH`.
+- Zweryfikowano działanie:
+  - `pio --version`
+  - `pio project init`
+  - `pio run`
 
-``` text
-Projekt/
-│
-├── docs/
-├── hardware/
-├── include/
-├── lib/
-│   ├── Board/
-│   └── Logger/
-├── scripts/
-├── src/
-│   ├── main.cpp
-│   ├── Application.cpp
-│   └── Application.h
-├── test/
-│
-├── .gitignore
-├── README.md
-└── platformio.ini
-```
+### 3.2 Git
 
-------------------------------------------------------------------------
+- Utworzono lokalne repozytorium.
+- Wypchnięto projekt do repozytorium zdalnego.
+- Potwierdzono poprawne działanie `git push`.
 
-## Pliki konfiguracyjne
+### 3.3 Struktura projektu
 
-Utworzono:
+Utrzymywany jest podział na katalogi: `docs`, `hardware`, `include`, `lib`, `scripts`, `src`, `test` oraz pliki bazowe (`platformio.ini`, `README.md`, `.gitignore`).
 
--   config.h
--   pins.h
--   project.h
--   version.h
+### 3.4 Konfiguracja
 
-Ich zadania:
+Utworzono pliki:
 
--   **config.h** -- konfiguracja projektu
--   **pins.h** -- definicje pinów
--   **version.h** -- wersja firmware
--   **project.h** -- wspólny nagłówek projektu
+- `config.h` -- konfiguracja projektu,
+- `pins.h` -- definicje pinów,
+- `version.h` -- wersja firmware,
+- `project.h` -- wspólny nagłówek projektu.
 
-------------------------------------------------------------------------
+### 3.5 Moduły bazowe
 
-## Logger
+`Logger`:
 
-Powstała pierwsza własna biblioteka.
+- inicjalizacja `Serial`,
+- podstawowe wysyłanie komunikatów.
 
-    lib/
-    └── Logger/
+`Board`:
 
-Na obecnym etapie:
+- inicjalizacja sprzętu,
+- konfiguracja pinów,
+- uruchomienie loggera.
 
--   inicjalizacja `Serial`
--   wysyłanie komunikatów
+---
 
-W przyszłości:
+## 4. Założenia architektury
 
--   poziomy logowania
--   timestamp
--   możliwość wyłączenia logów
--   zapis do pliku / MQTT / Wi-Fi
+Zasady:
 
-------------------------------------------------------------------------
+- `main.cpp` pozostaje minimalny,
+- sprzęt i inicjalizacja niskiego poziomu są w `Board`,
+- logika aplikacji jest w `Application`,
+- kod wielokrotnego użycia trafia do `lib`.
 
-## Board
+Docelowy przepływ warstw:
 
-Powstał moduł:
-
-    lib/
-    └── Board/
-
-Odpowiada za:
-
--   inicjalizację sprzętu
--   konfigurację pinów
--   uruchomienie Loggera
-
-Docelowo będzie również zawierał:
-
--   Wire
--   SPI
--   Watchdog
--   EEPROM
--   konfigurację zależną od płytki
-
-------------------------------------------------------------------------
-
-# Najważniejsze założenia architektury
-
-Przyjęto zasadę:
-
--   `main.cpp` ma być możliwie najmniejszy.
--   Inicjalizacja sprzętu trafia do `Board`.
--   Logika programu trafia do `Application`.
--   Kod wielokrotnego użytku trafia do `lib`.
-
-------------------------------------------------------------------------
-
-# Docelowa architektura
-
-``` text
+```text
 Application
-      │
-      ▼
+    │
+    ▼
 Services
-      │
-      ▼
+    │
+    ▼
 Devices
-      │
-      ▼
+    │
+    ▼
 Drivers
-      │
-      ▼
+    │
+    ▼
 Board
 ```
 
-------------------------------------------------------------------------
+---
 
-# Plan dalszych prac
+## 5. Standardy techniczne
 
-## Etap 1
+### 5.1 Konwencje kodu
 
-Dokończenie klasy `Application`.
+- Jeden moduł = jedna odpowiedzialność (SRP).
+- API modułów powinno być małe i jawne.
+- Brak logiki biznesowej w `main.cpp`.
+- Zmiany publicznego API wymagają aktualizacji dokumentacji.
 
-Docelowo:
+### 5.2 Obsługa błędów
 
--   `Application::begin()`
--   `Application::run()`
+- Każdy moduł zwraca status operacji (tam, gdzie to zasadne).
+- Błędy krytyczne: log + bezpieczny fallback.
+- Logi błędów mają zawierać kontekst modułu i kod błędu.
 
-`main.cpp` powinien zawierać wyłącznie:
+### 5.3 Logowanie
 
-``` cpp
-void setup()
-{
-    Board::init();
-    app.begin();
-}
+Minimalny format logu:
 
-void loop()
-{
-    app.run();
-}
-```
+`[LEVEL] [MODULE] message`
 
-------------------------------------------------------------------------
+Docelowe poziomy:
 
-## Etap 2
+- `DEBUG`
+- `INFO`
+- `WARNING`
+- `ERROR`
 
-Rozbudowa `Logger`.
+---
 
-Planowane funkcje:
+## 6. Matryca wsparcia platform (MVP)
 
--   info()
--   warning()
--   error()
--   debug()
+| Platforma | Status | Uwagi |
+|---|---|---|
+| Arduino AVR | W trakcie | Bazowy punkt startowy |
+| ESP32 | Planowane | Priorytet wysoki |
+| RP2040 / Pico | Planowane | Priorytet średni |
 
-------------------------------------------------------------------------
+---
 
-## Etap 3
+## 7. KPI (mierzalne cele jakości)
 
-Rozbudowa `Board`.
+- Build projektu przechodzi lokalnie: **100%**.
+- Czas pełnego buildu (docelowo): **< 90 s** na standardowym stanowisku.
+- Pokrycie testami modułów bazowych (`Logger`, `Application`): **>= 60%** (MVP).
+- Rozmiar firmware (MVP): monitorowany i raportowany przy release.
 
-Dodanie:
+---
 
--   Wire
--   SPI
--   Watchdog
--   konfiguracji zależnej od platformy
+## 8. Plan dalszych prac (z kryteriami akceptacji)
 
-------------------------------------------------------------------------
+## Etap 1 -- Domknięcie `Application`
 
-## Etap 4
+Zakres:
 
-Pierwsze uniwersalne moduły:
+- `Application::begin()`
+- `Application::run()`
 
--   Timer
--   Button
--   Relay
+Kryterium akceptacji:
 
-------------------------------------------------------------------------
+- `main.cpp` wywołuje tylko `Board::init()`, `app.begin()`, `app.run()`.
+- Build przechodzi bez błędów dla aktywnego środowiska PlatformIO.
 
-## Etap 5
+## Etap 2 -- Rozbudowa `Logger`
 
-Sterowanie urządzeniami:
+Zakres:
 
--   Pump
--   Motor
--   Sensor
+- `info()`, `warning()`, `error()`, `debug()`
 
-------------------------------------------------------------------------
+Kryterium akceptacji:
 
-## Etap 6
+- wszystkie poziomy logowania działają,
+- istnieje możliwość wyłączenia `DEBUG` kompilacyjnie.
 
-Komunikacja:
+## Etap 3 -- Rozbudowa `Board`
 
--   UART
--   I²C
--   SPI
--   CAN
--   MQTT
--   Wi-Fi
--   BLE
+Zakres:
 
-------------------------------------------------------------------------
+- integracja `Wire`, `SPI`, `Watchdog`,
+- konfiguracja zależna od platformy.
 
-## Etap 7
+Kryterium akceptacji:
 
-Wyświetlacze i interfejs użytkownika.
+- uruchomienie na min. 2 platformach z matrycy wsparcia,
+- brak zmian w API `Application` przy zmianie platformy.
 
-------------------------------------------------------------------------
+## Etap 4 -- Moduły uniwersalne
 
-## Etap 8
+Zakres:
 
-Testy jednostkowe.
+- `Timer`, `Button`, `Relay`
 
-------------------------------------------------------------------------
+Kryterium akceptacji:
 
-## Etap 9
+- każdy moduł ma prosty przykład użycia,
+- każdy moduł ma test(y) jednostkowe lub testy integracyjne MVP.
 
-Automatyzacja:
+## Etap 5 -- Urządzenia
 
--   wersjonowanie
--   skrypty
--   release
--   flash
+Zakres:
 
-------------------------------------------------------------------------
+- `Pump`, `Motor`, `Sensor`
 
-# Zasady projektu
+Kryterium akceptacji:
 
-1.  Jeden projekt = jedno repozytorium Git.
-2.  Jeden moduł = jedna odpowiedzialność.
-3.  Nie tworzyć katalogów „na zapas".
-4.  Dodawać moduły dopiero wtedy, gdy pojawi się rzeczywista potrzeba.
-5.  `main.cpp` powinien pozostawać możliwie prosty.
-6.  Wszystkie nowe elementy mają być możliwe do ponownego wykorzystania.
+- moduły korzystają z warstwy `Devices` i nie łamią granic warstw.
 
-------------------------------------------------------------------------
+## Etap 6 -- Komunikacja
 
-# Cel końcowy
+Zakres:
 
-Stworzenie własnego, lekkiego frameworka embedded opartego o PlatformIO,
-wykorzystywanego we wszystkich przyszłych projektach, rozwijanego
-stopniowo wraz z kolejnymi realizacjami.
+- `UART`, `I2C`, `SPI`, `CAN`, `MQTT`, `Wi-Fi`, `BLE`
+
+Kryterium akceptacji:
+
+- przynajmniej 2 kanały komunikacji dostarczone end-to-end (MVP).
+
+## Etap 7 -- UI / Display
+
+Kryterium akceptacji:
+
+- co najmniej 1 spójny interfejs użytkownika dla platformy docelowej.
+
+## Etap 8 -- Testy i jakość
+
+Kryterium akceptacji:
+
+- testy automatyczne uruchamiane lokalnie,
+- raport z wynikami testów i podstawowych metryk.
+
+## Etap 9 -- Automatyzacja
+
+Zakres:
+
+- wersjonowanie,
+- skrypty,
+- release,
+- flash.
+
+Kryterium akceptacji:
+
+- powtarzalny proces release opisany w dokumentacji i zweryfikowany praktycznie.
+
+---
+
+## 9. Ryzyka i działania zapobiegawcze
+
+1. **Ryzyko:** różnice między platformami (API, peryferia).  
+   **Mitigacja:** warstwa abstrakcji + testy na min. 2 platformach.
+
+2. **Ryzyko:** rozrost kodu i utrata spójności.  
+   **Mitigacja:** SRP, przeglądy modułów, jasne granice warstw.
+
+3. **Ryzyko:** brak regularnych testów.  
+   **Mitigacja:** szybkie testy modułów bazowych już od wczesnych etapów.
+
+---
+
+## 10. ADR -- rejestr decyzji architektonicznych
+
+Każda ważna decyzja architektoniczna powinna mieć wpis ADR:
+
+- Data,
+- Kontekst,
+- Decyzja,
+- Konsekwencje,
+- Status (proponowana/zaakceptowana/zastąpiona).
+
+---
+
+## 11. Zasady projektu
+
+1. Jeden projekt = jedno repozytorium Git.
+2. Jeden moduł = jedna odpowiedzialność.
+3. Nie tworzyć katalogów „na zapas”.
+4. Dodawać moduły dopiero przy realnej potrzebie.
+5. `main.cpp` powinien pozostawać możliwie prosty.
+6. Wszystkie nowe elementy muszą być możliwe do ponownego użycia.
+
+---
+
+## 12. Cel końcowy
+
+Stworzenie własnego, lekkiego frameworka embedded opartego o PlatformIO, rozwijanego iteracyjnie i wykorzystywanego we wszystkich kolejnych projektach.

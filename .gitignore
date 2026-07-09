@@ -1,1 +1,27 @@
-.pio
+.pio/
+
+# PlatformIO
+.piolibdeps/
+
+# VS Code (lokalne / generowane)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+
+# Python cache / env (np. skrypty pomocnicze)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Logi i pliki tymczasowe
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Systemowe
+Thumbs.db
+.DS_Store
